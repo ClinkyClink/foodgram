@@ -4,7 +4,7 @@ volumes:
   media_volume:
   
 services:
-  db:
+  foodgram_db:
     image: postgres:13
     env_file: ../backend/foodgram/.env
     volumes:
@@ -33,7 +33,7 @@ services:
     build: ../backend/foodgram/
     env_file: ../backend/foodgram/.env
     depends_on:
-      - db
+      - foodgram_db
     volumes:
       - static_volume:/app/static/
       - media_volume:/app/media/
