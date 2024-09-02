@@ -17,7 +17,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:7000',
 ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
