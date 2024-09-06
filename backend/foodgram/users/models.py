@@ -35,8 +35,14 @@ class User(AbstractUser):
         max_length=20,
         default=USER,
     )
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    avatar = models.ImageField(
+        verbose_name='Аватар пользователя',
+        upload_to='users/',
+        null=True,
+        blank=True,
+    )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     @property
     def is_user(self):
