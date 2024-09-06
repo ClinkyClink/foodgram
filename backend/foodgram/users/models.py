@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -15,6 +16,7 @@ class User(AbstractUser):
         'Имя пользователя',
         max_length=150,
         unique=True,
+        validators=(UnicodeUsernameValidator(),),
     )
     first_name = models.CharField(
         'Имя',
@@ -37,7 +39,7 @@ class User(AbstractUser):
     )
     avatar = models.ImageField(
         verbose_name='Аватар пользователя',
-        upload_to='users/',
+        upload_to='users/avatars',
         null=True,
         blank=True,
     )
