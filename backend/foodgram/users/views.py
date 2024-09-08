@@ -1,5 +1,5 @@
 from api.pagination import CustomPagination
-from api.serializers import CustomUserSerializer, SubscribeSerializer
+from api.serializers import CustomUserSerializer, SubscribeSerializer, AvatarSerializer
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -58,3 +58,27 @@ class CustomUserViewSet(UserViewSet):
                                          many=True,
                                          context={'request': request})
         return self.get_paginated_response(serializer.data)
+    
+    @action(detail=False, url_path='me', permission_classes=(IsAuthenticated,))
+    def me(self, request):
+        serializer = CustomUserSerializer(
+            request.user,
+            context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=('put',), url_path='me/avatar',
+            permission_classes=(IsAuthenticated,))
+    def update_avatar(self, request):
+        user = request.user
+        serializer = AvatarSerializer(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @update_avatar.mapping.delete
+    def delete_avatar(self, request):
+        user = request.user
+        if user.avatar:
+            user.avatar.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
