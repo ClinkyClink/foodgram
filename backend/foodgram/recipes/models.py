@@ -75,8 +75,19 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     """Модель для связи рецептов и ингредиентов с количеством."""
 
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipeingredients',
+        verbose_name='Рецепт'
+
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='recipeingredients',
+        verbose_name='Ингредиент'
+    )
     amount = models.PositiveIntegerField(
         'Количество',
         validators=[MinValueValidator(1)]
@@ -126,19 +137,19 @@ class ShoppingList(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_list',
+        related_name='shopping_cart',
         verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_list',
+        related_name='shopping_cart',
         verbose_name='Рецепт'
     )
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'recipe'], name='unique_shopping_list')
+            models.UniqueConstraint(fields=['user', 'recipe'], name='unique_shopping_cart')
         ]
         verbose_name = 'Корзина покупок'
         verbose_name_plural = 'Корзина покупок'
