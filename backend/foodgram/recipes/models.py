@@ -75,6 +75,10 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     """Модель для связи рецептов и ингредиентов с количеством."""
 
+    amount = models.PositiveIntegerField(
+        'Количество',
+        validators=[MinValueValidator(1)]
+    )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -85,12 +89,8 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='recipeingredients',
+        related_name='ingredientrecipes',
         verbose_name='Ингредиент'
-    )
-    amount = models.PositiveIntegerField(
-        'Количество',
-        validators=[MinValueValidator(1)]
     )
 
     class Meta:
