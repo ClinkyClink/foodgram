@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.db.models import Sum
+from django.db.models import Sum, OuterRef, Exists, Value, BooleanField
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
@@ -43,6 +43,30 @@ class RecipeViewSet(ModelViewSet):
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+
+        if self.request.user.is_authenticated:
+            favorite_subquery = Favorite.objects.filter(
+                user=self.request.user,
+                recipe=OuterRef('pk')
+            )
+            shopping_cart_subquery = ShoppingList.objects.filter(
+                user=self.request.user,
+                recipe=OuterRef('pk')
+            )
+            queryset = queryset.annotate(
+                is_favorited=Exists(favorite_subquery),
+                is_in_shopping_cart=Exists(shopping_cart_subquery)
+            )
+        else:
+            queryset = queryset.annotate(
+                is_favorited=Value(False, output_field=BooleanField()),
+                is_in_shopping_cart=Value(False, output_field=BooleanField())
+            )
+
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

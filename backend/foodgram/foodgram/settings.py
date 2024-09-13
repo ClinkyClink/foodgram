@@ -9,14 +9,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
-if DEBUG:
-    CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
-if not DEBUG:
-    CSRF_TRUSTED_ORIGINS = ['http://ark-foodgram.duckdns.org/', 'https://ark-foodgram.duckdns.org/']
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost, https://localhost').split(',')
 
 # Application definition
 
