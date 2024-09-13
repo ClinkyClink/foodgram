@@ -1,23 +1,23 @@
 from datetime import datetime
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from recipes.models import (Favorite, Ingredient, RecipeIngredient, Recipe,
-                            ShoppingList, Tag)
+                            ShoppingList, Tag, ShortLink)
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPagination
-from .permissions import IsAdminOrReadOnly, IsAuthorOrAdmin
+from .permissions import IsAuthorOrAdmin
 from .serializers import (IngredientSerializer, RecipeGetSerializer,
                           RecipeShortSerializer, RecipeCreateSerializer,
-                          TagSerializer)
+                          TagSerializer, ShortLinkSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -128,3 +128,21 @@ class RecipeViewSet(ModelViewSet):
         )
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
+
+@api_view(['GET'])
+def get_short_link(request, recipe_id):
+    """
+    Получение или создание короткой ссылки для рецепта.
+    """
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    short_link, created = ShortLink.objects.get_or_create(recipe=recipe)
+    serializer = ShortLinkSerializer(short_link)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def redirect_short_link(request, short_link):
+    """Перенаправляет на соответствующий рецепт по короткой ссылке."""
+    short_link_obj = get_object_or_404(ShortLink, short_link=short_link)
+    return redirect(f"/recipes/{short_link_obj.recipe.pk}/")

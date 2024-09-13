@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, SerializerMethodField, CharField
@@ -7,9 +8,8 @@ from rest_framework.serializers import ModelSerializer, ReadOnlyField, BooleanFi
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 
-from recipes.models import Ingredient, RecipeIngredient, Recipe, Tag, ShoppingList, Favorite
+from recipes.models import Ingredient, RecipeIngredient, Recipe, Tag, ShortLink
 from users.models import Subscribe, User
-from .utils import create_ingredients
 
 
 class TagSerializer(ModelSerializer):
@@ -298,3 +298,24 @@ class RecipeShortSerializer(ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class ShortLinkSerializer(ModelSerializer):
+    """Сериализатор для короткой ссылки."""
+    short_link = SerializerMethodField()
+
+    class Meta:
+        model = ShortLink
+        fields = ('short_link',)
+
+    def get_short_link(self, obj):
+        """Создает полный URL для короткой ссылки."""
+        base_url = f'{settings.SITE_HOSTNAME}/s/'
+        return f"{base_url}{obj.short_link}"
+
+    def to_representation(self, instance):
+        """Преобразует ключи в формат с дефисом."""
+        representation = super().to_representation(instance)
+        return {
+            'short-link': representation['short_link']
+        }

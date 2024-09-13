@@ -1,6 +1,10 @@
+import random
+from string import ascii_letters, digits
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -156,3 +160,27 @@ class ShoppingList(models.Model):
 
     def __str__(self):
         return f'{self.user} добавил "{self.recipe}" в свою корзину'
+
+
+class ShortLink(models.Model):
+    """Модель для хранения коротких ссылок на рецепты."""
+
+    recipe = models.OneToOneField(Recipe, on_delete=models.CASCADE,
+                                  related_name='short_link')
+    short_link = models.CharField(max_length=3, unique=True,
+                                  blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.short_link:
+            self.short_link = self.generate_short_link()
+        super().save(*args, **kwargs)
+
+    def generate_short_link(self):
+        """Генерирует уникальную короткую ссылку."""
+        length = 3
+        characters = ascii_letters + digits
+        while True:
+            short_link = ''.join(random.choices(characters, k=length))
+            if not ShortLink.objects.filter(short_link=short_link).exists():
+                break
+        return short_link
