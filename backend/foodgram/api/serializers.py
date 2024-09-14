@@ -41,6 +41,7 @@ class UserSignUpSerializer(UserCreateSerializer):
 
 class CustomUserSerializer(UserSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
+    avatar = Base64ImageField(required=False)
 
     class Meta:
         model = User
@@ -111,7 +112,7 @@ class RecipeIngredientCreateSerializer(ModelSerializer):
 class RecipeGetSerializer(ModelSerializer):
     """Сериализатор для получения рецепта."""
 
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(many=True, required=True)
     ingredients = RecipeIngredientsSerializer(
         many=True,
@@ -188,9 +189,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     def validate(self, data):
         """
-        Проверяет, что ингредиенты и теги уникальны и существуют.
-        и что они не пустые.
-        """
+        Проверяет, что ингредиенты и теги уникальны и существуют."""
 
         ingredients = data.get('ingredients', [])
 
@@ -222,10 +221,11 @@ class RecipeCreateSerializer(ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         """Создает новый рецепт."""
+        author = self.context.get('request').user
         ingredients_data = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-
-        recipe = Recipe.objects.create(**validated_data)
+        validated_data.pop('author', None)
+        recipe = Recipe.objects.create(author=author,**validated_data)
         recipe.tags.set(tags)
 
         ingredient_ids = [ingredient_data.get('id')

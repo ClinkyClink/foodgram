@@ -29,21 +29,20 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         author_id = self.kwargs.get('id')
         author = get_object_or_404(User, id=author_id)
-
         if request.method == 'POST':
-            serializer = SubscribeSerializer(author,
-                                             data=request.data,
-                                             context={'request': request})
-            serializer.is_valid(raise_exception=True)
+            if Subscribe.objects.filter(user=user, author=author).exists():
+                return Response({'error': 'Вы уже подписаны на этого пользователя!'}, status=status.HTTP_400_BAD_REQUEST)
+            if user == author:
+                return Response({'error': 'Нельзя подписаться на самого себя!'}, status=status.HTTP_400_BAD_REQUEST)
             Subscribe.objects.create(user=user, author=author)
+            serializer = SubscribeSerializer(author, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            subscription = get_object_or_404(Subscribe,
-                                             user=user,
-                                             author=author)
+            subscription = get_object_or_404(Subscribe, user=user, author=author)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
 
     @action(
         detail=False,
