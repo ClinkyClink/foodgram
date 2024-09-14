@@ -153,6 +153,7 @@ class RecipeViewSet(ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
 
+
 @api_view(['GET'])
 def get_short_link(request, recipe_id):
     """

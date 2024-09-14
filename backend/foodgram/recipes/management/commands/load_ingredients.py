@@ -26,17 +26,28 @@ class Command(BaseCommand):
             with open(path, 'r', encoding='utf-8') as file:
                 reader = list(csv.reader(file))
                 row_count = len(reader) - 1
-                bar = IncrementalBar('ingredients.csv'.ljust(17), max=row_count)
-                
+                bar = IncrementalBar('ingredients.csv'.ljust(17),
+                                     max=row_count)
                 for row in reader[1:]:
                     if len(row) < 2 or not row[0] or not row[1]:
                         continue
                     bar.next()
                     ingredient_create(row)
                 bar.finish()
-                
-            self.stdout.write(self.style.SUCCESS('The ingredients have been loaded successfully.'))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    'The ingredients have been loaded successfully.'
+                )
+            )
         except FileNotFoundError:
-            self.stdout.write(self.style.ERROR('File not found. Please check the path.'))
+            self.stdout.write(
+                self.style.ERROR(
+                    'File not found. Please check the path.'
+                )
+            )
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'An error occurred: {e}'))
+            self.stdout.write(
+                self.style.ERROR(
+                    f'An error occurred: {e}'
+                )
+            )

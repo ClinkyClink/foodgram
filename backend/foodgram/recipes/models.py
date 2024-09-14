@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class Ingredient(models.Model):
     """Модель ингредиентов."""
 
@@ -101,11 +102,15 @@ class RecipeIngredient(models.Model):
         verbose_name = 'Ингредиент рецепта'
         verbose_name_plural = 'Ингредиенты рецепта'
         constraints = [
-            models.UniqueConstraint(fields=['recipe', 'ingredient'], name='unique_recipe_ingredient')
+            models.UniqueConstraint(fields=['recipe', 'ingredient'],
+                                    name='unique_recipe_ingredient')
         ]
 
     def __str__(self):
-        return f'{self.ingredient.name} в {self.recipe.name}: {self.amount} {self.ingredient.measurement_unit}'
+        return (
+            f'{self.ingredient.name} в {self.recipe.name}: '
+            f'{self.amount} {self.ingredient.measurement_unit}'
+        )
 
 
 class Favorite(models.Model):
@@ -126,7 +131,8 @@ class Favorite(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'recipe'], name='unique_favorite')
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique_favorite')
         ]
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные рецепты'
@@ -153,7 +159,8 @@ class ShoppingList(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'recipe'], name='unique_shopping_cart')
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique_shopping_cart')
         ]
         verbose_name = 'Корзина покупок'
         verbose_name_plural = 'Корзина покупок'

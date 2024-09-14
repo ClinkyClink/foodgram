@@ -21,8 +21,6 @@ class UserAdmin(admin.ModelAdmin):
 class SubscribeAdmin(admin.ModelAdmin):
     list_display = ('id',
                     'user',
-                    'author'
-    )
+                    'author')
     search_fields = ('user',)
     empty_value_display = 'пусто'
-

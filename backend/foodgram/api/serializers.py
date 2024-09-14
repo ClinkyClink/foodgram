@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import IntegerField, SerializerMethodField, CharField
+from rest_framework.fields import (IntegerField, SerializerMethodField,
+                                   CharField)
 from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.serializers import ModelSerializer, ReadOnlyField, BooleanField
+from rest_framework.serializers import ModelSerializer, BooleanField
 
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -45,7 +46,8 @@ class CustomUserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'avatar')
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed', 'avatar')
 
     def get_is_subscribed(self, author):
         user = self.context.get('request').user
@@ -59,7 +61,8 @@ class SubscribeSerializer(CustomUserSerializer):
     recipes = SerializerMethodField()
 
     class Meta(CustomUserSerializer.Meta):
-        fields = CustomUserSerializer.Meta.fields + ('recipes_count', 'recipes')
+        fields = CustomUserSerializer.Meta.fields + ('recipes_count',
+                                                     'recipes')
         read_only_fields = ('email', 'username')
 
     def validate(self, data):
@@ -225,7 +228,7 @@ class RecipeCreateSerializer(ModelSerializer):
         ingredients_data = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         validated_data.pop('author', None)
-        recipe = Recipe.objects.create(author=author,**validated_data)
+        recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags)
 
         ingredient_ids = [ingredient_data.get('id')

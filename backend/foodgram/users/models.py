@@ -10,6 +10,7 @@ ROLE_CHOICES = [
     (ADMIN, 'Администратор'),
 ]
 
+
 class User(AbstractUser):
     """Модель пользователя."""
     username = models.CharField(
@@ -68,6 +69,7 @@ class User(AbstractUser):
                 'Должно быть установлено имя пользователя и email.'
             )
         super().save(*args, **kwargs)
+
 
 class Subscribe(models.Model):
     user = models.ForeignKey(
