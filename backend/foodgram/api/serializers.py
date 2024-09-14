@@ -2,13 +2,12 @@ from django.conf import settings
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import (CharField, IntegerField,
                                    SerializerMethodField)
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import BooleanField, ModelSerializer
-
-from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from users.models import Subscribe, User
 
 
