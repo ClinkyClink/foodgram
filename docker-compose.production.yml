@@ -1,0 +1,37 @@
+volumes:
+  foodgram_data:
+  static_volume:
+  media_volume:
+  
+services:
+  foodgram_db:
+    image: postgres:13
+    env_file: .env
+    volumes:
+      - foodgram_data:/var/lib/postgresql/data/
+
+  frontend:
+    image: clinkyclink/foodgram_frontend
+    volumes:
+      - ../frontend/:/app/result_build/
+
+  nginx:
+    image: clinkyclink/foodgram_gateway
+    ports:
+      - "7000:80"
+    volumes:
+      - ../frontend/build:/usr/share/nginx/html/
+      - static_volume:/app/static/
+      - media_volume:/app/media/
+    depends_on:
+      - backend
+      - frontend
+
+  backend:
+    image: clinkyclink/foodgram_backend
+    env_file: .env
+    depends_on:
+      - foodgram_db
+    volumes:
+      - static_volume:/app/static/
+      - media_volume:/app/media/
