@@ -20,7 +20,7 @@ class TagAdmin(admin.ModelAdmin):
 class RecipeIngredientInline(admin.TabularInline):
     model = models.RecipeIngredient
     extra = 1
-    fields = ('ingredient', 'amount', 'measurement_unit')
+    fields = ('ingredient', 'amount')
 
 
 @admin.register(models.Recipe)
