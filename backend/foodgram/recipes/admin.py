@@ -22,9 +22,8 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author', 'in_favorites')
     list_editable = ('name',)
     readonly_fields = ('in_favorites',)
-    list_filter = ('tags',)
-    search_fields = ('name', 'author', 'ingredients__name')
-    filter_horizontal = ('ingredients',)
+    list_filter = ('tags', 'ingredients')
+    search_fields = ('name', 'author',)
     empty_value_display = 'пусто'
 
     @admin.display(description='В избранном')
