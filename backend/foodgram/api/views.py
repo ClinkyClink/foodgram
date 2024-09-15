@@ -86,8 +86,23 @@ class RecipeViewSet(ModelViewSet):
         """Метод для добавления/удаления из избранного."""
         if request.method == 'POST':
             return self.add_to(Favorite, request.user, pk)
+        elif request.method == 'DELETE':
+            recipe = Recipe.objects.filter(id=pk).first()
+            if not recipe:
+                # Если рецепт не существует — возвращаем 404
+                return Response({'errors': 'Рецепт не найден'},
+                                status=status.HTTP_404_NOT_FOUND)
+            try:
+                obj = Favorite.objects.get(user=request.user, recipe=recipe)
+                obj.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except Favorite.DoesNotExist:
+                # Если рецепт существует, но не был добавлен в избранное — 400
+                return Response(
+                    {'errors': 'Рецепт не был добавлен в избранное'},
+                    status=status.HTTP_400_BAD_REQUEST)
         else:
-            return self.delete_from(Favorite, request.user, pk)
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
         detail=True,
@@ -98,8 +113,21 @@ class RecipeViewSet(ModelViewSet):
         """Метод для добавления/удаления из списка покупок."""
         if request.method == 'POST':
             return self.add_to(ShoppingList, request.user, pk)
+        elif request.method == 'DELETE':
+            recipe = Recipe.objects.filter(id=pk).first()
+            if not recipe:
+                return Response({'errors': 'Рецепт не найден'},
+                                status=status.HTTP_404_NOT_FOUND)
+            try:
+                obj = ShoppingList.objects.get(user=request.user,
+                                               recipe=recipe)
+                obj.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except ShoppingList.DoesNotExist:
+                return Response({'errors': 'Рецепт не был добавлен в корзину'},
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
-            return self.delete_from(ShoppingList, request.user, pk)
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def add_to(self, model, user, pk):
         """Метод для добавления."""
@@ -113,12 +141,12 @@ class RecipeViewSet(ModelViewSet):
 
     def delete_from(self, model, user, pk):
         """Метод для удаления."""
-        obj = model.objects.filter(user=user, recipe__id=pk)
-        if obj.exists():
+        try:
+            obj = model.objects.get(user=user, recipe__id=pk)
             obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({'errors': 'Рецепт уже удален!'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        except model.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=False,

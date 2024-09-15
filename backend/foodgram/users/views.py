@@ -47,8 +47,13 @@ class CustomUserViewSet(UserViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            subscription = get_object_or_404(Subscribe, user=user,
-                                             author=author)
+            if not Subscribe.objects.filter(user=user, author=author).exists():
+                return Response(
+                    {'error': 'Подписки не существует'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            subscription = Subscribe.objects.get(user=user, author=author)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
