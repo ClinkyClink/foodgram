@@ -19,7 +19,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(models.Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'in_favorites', 'ingredients')
+    list_display = ('id', 'name', 'author', 'in_favorites')
     list_editable = ('name',)
     readonly_fields = ('in_favorites',)
     list_filter = ('tags',)
@@ -29,6 +29,11 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='В избранном')
     def in_favorites(self, obj):
         return obj.favorites.count()
+
+    @admin.display(description='Ингредиенты')
+    def ingredients_list(self, request):
+        """Возвращает набор ингредиентов для отображения."""
+        return models.Ingredient.objects.all()
 
 
 @admin.register(models.RecipeIngredient)
