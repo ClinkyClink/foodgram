@@ -3,6 +3,9 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from recipes.constants import (MAX_LENGTH_USER, MAX_LENGTH_EMAIL,
+                               MAX_LENGTH_ROLE)
+
 USER = 'user'
 ADMIN = 'admin'
 ROLE_CHOICES = [
@@ -15,27 +18,27 @@ class User(AbstractUser):
     """Модель пользователя."""
     username = models.CharField(
         'Имя пользователя',
-        max_length=150,
+        max_length=MAX_LENGTH_USER,
         unique=True,
         validators=(UnicodeUsernameValidator(),),
     )
     first_name = models.CharField(
         'Имя',
-        max_length=150,
+        max_length=MAX_LENGTH_USER,
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=150,
+        max_length=MAX_LENGTH_USER,
     )
     email = models.EmailField(
         'Электронная почта',
-        max_length=254,
+        max_length=MAX_LENGTH_EMAIL,
         unique=True,
     )
     role = models.CharField(
         verbose_name='Роль',
         choices=ROLE_CHOICES,
-        max_length=20,
+        max_length=MAX_LENGTH_ROLE,
         default=USER,
     )
     avatar = models.ImageField(

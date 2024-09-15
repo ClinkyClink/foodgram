@@ -5,14 +5,22 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from .constants import (MAX_LENGTH_NAME_INGREDIENT,
+                        MAX_LENGTH_NAME_RECIPE,
+                        MAX_LENGTH_SLUG, MAX_LENGTH_UNIT, MAX_LENGTH_SHORTLINK,
+                        MAX_LENGTH_TAG)
+
 User = get_user_model()
 
 
 class Ingredient(models.Model):
     """Модель ингредиентов."""
 
-    name = models.CharField('Название', max_length=100, db_index=True)
-    measurement_unit = models.CharField('Единица измерения', max_length=50)
+    name = models.CharField('Название',
+                            max_length=MAX_LENGTH_NAME_INGREDIENT,
+                            db_index=True)
+    measurement_unit = models.CharField('Единица измерения',
+                                        max_length=MAX_LENGTH_UNIT)
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -26,8 +34,12 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     """Модель тегов."""
 
-    name = models.CharField('Название', unique=True, max_length=100)
-    slug = models.SlugField('Слаг', unique=True, max_length=100)
+    name = models.CharField('Название',
+                            unique=True,
+                            max_length=MAX_LENGTH_TAG)
+    slug = models.SlugField('Слаг',
+                            unique=True,
+                            max_length=MAX_LENGTH_SLUG)
 
     class Meta:
         verbose_name = 'Тег'
@@ -40,7 +52,9 @@ class Tag(models.Model):
 class Recipe(models.Model):
     """Модель рецептов."""
 
-    name = models.CharField('Название', max_length=256, db_index=True)
+    name = models.CharField('Название',
+                            max_length=MAX_LENGTH_NAME_RECIPE,
+                            db_index=True)
     author = models.ForeignKey(
         User,
         related_name='recipes',
@@ -173,7 +187,7 @@ class ShortLink(models.Model):
 
     recipe = models.OneToOneField(Recipe, on_delete=models.CASCADE,
                                   related_name='short_link')
-    short_link = models.CharField(max_length=3, unique=True,
+    short_link = models.CharField(max_length=MAX_LENGTH_SHORTLINK, unique=True,
                                   blank=True, null=True)
 
     def save(self, *args, **kwargs):

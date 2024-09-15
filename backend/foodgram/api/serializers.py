@@ -2,12 +2,14 @@ from django.conf import settings
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import (CharField, IntegerField,
                                    SerializerMethodField)
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import BooleanField, ModelSerializer
+
+from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
+from recipes.constants import MAX_LENGTH_NAME_RECIPE
 from users.models import Subscribe, User
 
 
@@ -165,7 +167,7 @@ class RecipeCreateSerializer(ModelSerializer):
         required=True
     )
     image = Base64ImageField(required=True)
-    name = CharField(max_length=256)
+    name = CharField(max_length=MAX_LENGTH_NAME_RECIPE)
     text = CharField()
     cooking_time = IntegerField()
 
@@ -176,7 +178,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     def validate_cooking_time(self, value):
 
-        if value == 0:
+        if value <= 0:
             raise ValidationError(
                 'Время приготовления должно быть больше 0'
             )
