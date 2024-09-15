@@ -8,8 +8,8 @@ from rest_framework.fields import (CharField, IntegerField,
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import BooleanField, ModelSerializer
 
-from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from recipes.constants import MAX_LENGTH_NAME_RECIPE
+from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from users.models import Subscribe, User
 
 
