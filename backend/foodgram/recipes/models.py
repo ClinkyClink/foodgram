@@ -1,6 +1,7 @@
 import random
 from string import ascii_letters, digits
 
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -123,6 +124,11 @@ class RecipeIngredient(models.Model):
             f'{self.ingredient.name} в {self.recipe.name}: '
             f'{self.amount} {self.ingredient.measurement_unit}'
         )
+
+    def clean(self):
+        if not self.ingredient:
+            raise ValidationError("Ингредиент должен быть выбран")
+        return super().clean()
 
 
 class Favorite(models.Model):
