@@ -128,6 +128,8 @@ class RecipeIngredient(models.Model):
     def clean(self):
         if not self.ingredient:
             raise ValidationError("Ингредиент должен быть выбран")
+        if self.amount < 1:
+            raise ValidationError("Количество должно быть больше 0")
         return super().clean()
 
 

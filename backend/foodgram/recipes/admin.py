@@ -23,17 +23,13 @@ class RecipeAdmin(admin.ModelAdmin):
     list_editable = ('name',)
     readonly_fields = ('in_favorites',)
     list_filter = ('tags',)
-    search_fields = ('name', 'author',)
+    search_fields = ('name', 'author', 'ingredients__name')
+    filter_horizontal = ('ingredients',)
     empty_value_display = 'пусто'
 
     @admin.display(description='В избранном')
     def in_favorites(self, obj):
         return obj.favorites.count()
-
-    @admin.display(description='Ингредиенты')
-    def ingredients_list(self, request):
-        """Возвращает набор ингредиентов для отображения."""
-        return models.Ingredient.objects.all()
 
 
 @admin.register(models.RecipeIngredient)
