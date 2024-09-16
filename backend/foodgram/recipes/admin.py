@@ -8,7 +8,10 @@ class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
     def clean(self):
         super().clean()
         if self.instance.pk is None:
-            count = sum(1 for form in self.forms if form.cleaned_data)
+            count = 0
+            for form in self.forms:
+                if form.cleaned_data:
+                    count += 1
             if count < 1:
                 raise forms.ValidationError('Добавьте ингредиенты')
         else:
@@ -22,6 +25,13 @@ class RecipeIngredientInline(admin.TabularInline):
     model = models.RecipeIngredient
     formset = IngredientsInlineFormset
     extra = 2
+    fields = ('name', 'quantity', 'unit')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('name'):
+            raise forms.ValidationError('Название ингредиента обязательно')
+        return cleaned_data
 
 
 @admin.register(models.Ingredient)
@@ -51,6 +61,11 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='В избранном')
     def in_favorites(self, obj):
         return obj.favorites.count()
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if obj.recipeingredients.count() < 1:
+            raise forms.ValidationError('Добавьте ингредиенты')
 
 
 @admin.register(models.RecipeIngredient)
