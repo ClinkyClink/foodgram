@@ -65,7 +65,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        formsets = self.get_inline_formsets(request, obj, form, change)
+        formsets = self.get_inline_formsets(request, [obj], form, change)
         for formset in formsets:
             if formset.model == models.RecipeIngredient:
                 formset.save()
