@@ -4,8 +4,6 @@ from django.db.models import BooleanField, Exists, OuterRef, Sum, Value
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingList, ShortLink, Tag)
 from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
@@ -13,12 +11,16 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from recipes.models import (
+    Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingList, ShortLink,
+    Tag)
+
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrAdmin
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeGetSerializer, RecipeShortSerializer,
-                          ShortLinkSerializer, TagSerializer)
+from .serializers import (
+    IngredientSerializer, RecipeCreateSerializer, RecipeGetSerializer,
+    RecipeShortSerializer, ShortLinkSerializer, TagSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -84,23 +86,20 @@ class RecipeViewSet(ModelViewSet):
     )
     def favorite(self, request, pk):
         """Метод для добавления/удаления из избранного."""
+        recipe = get_object_or_404(Recipe, pk=pk)
+
         if request.method == 'POST':
             return self.add_to(Favorite, request.user, pk)
         elif request.method == 'DELETE':
-            recipe = Recipe.objects.filter(id=pk).first()
-            if not recipe:
-                # Если рецепт не существует — возвращаем 404
-                return Response({'errors': 'Рецепт не найден'},
-                                status=status.HTTP_404_NOT_FOUND)
             try:
                 obj = Favorite.objects.get(user=request.user, recipe=recipe)
                 obj.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             except Favorite.DoesNotExist:
-                # Если рецепт существует, но не был добавлен в избранное — 400
                 return Response(
                     {'errors': 'Рецепт не был добавлен в избранное'},
-                    status=status.HTTP_400_BAD_REQUEST)
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         else:
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -111,13 +110,11 @@ class RecipeViewSet(ModelViewSet):
     )
     def shopping_cart(self, request, pk):
         """Метод для добавления/удаления из списка покупок."""
+        recipe = get_object_or_404(Recipe, pk=pk)
+
         if request.method == 'POST':
             return self.add_to(ShoppingList, request.user, pk)
         elif request.method == 'DELETE':
-            recipe = Recipe.objects.filter(id=pk).first()
-            if not recipe:
-                return Response({'errors': 'Рецепт не найден'},
-                                status=status.HTTP_404_NOT_FOUND)
             try:
                 obj = ShoppingList.objects.get(user=request.user,
                                                recipe=recipe)

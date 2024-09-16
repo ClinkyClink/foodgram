@@ -2,13 +2,14 @@ from django.conf import settings
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.constants import MAX_LENGTH_NAME_RECIPE
-from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import (CharField, IntegerField,
-                                   SerializerMethodField)
+from rest_framework.fields import (
+    CharField, IntegerField, SerializerMethodField)
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import BooleanField, ModelSerializer
+
+from recipes.constants import MAX_LENGTH_NAME_RECIPE
+from recipes.models import Ingredient, Recipe, RecipeIngredient, ShortLink, Tag
 from users.models import Subscribe, User
 
 
@@ -190,8 +191,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return value
 
     def validate(self, data):
-        """
-        Проверяет, что ингредиенты и теги уникальны и существуют."""
+        """Проверяет, что ингредиенты и теги уникальны и существуют."""
 
         ingredients = data.get('ingredients', [])
 
@@ -209,7 +209,7 @@ class RecipeCreateSerializer(ModelSerializer):
         ]
         if non_existing_ingredients:
             raise ValidationError(
-                f"Ингредиент с id {non_existing_ingredients} не существует."
+                f'Ингредиент с id {non_existing_ingredients} не существует.'
             )
 
         tags = data.get('tags', [])
@@ -313,7 +313,7 @@ class ShortLinkSerializer(ModelSerializer):
     def get_short_link(self, obj):
         """Создает полный URL для короткой ссылки."""
         base_url = f'{settings.SITE_HOSTNAME}/s/'
-        return f"{base_url}{obj.short_link}"
+        return f'{base_url}{obj.short_link}'
 
     def to_representation(self, instance):
         """Преобразует ключи в формат с дефисом."""

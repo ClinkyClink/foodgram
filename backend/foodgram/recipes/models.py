@@ -6,9 +6,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from .constants import (MAX_LENGTH_NAME_INGREDIENT, MAX_LENGTH_NAME_RECIPE,
-                        MAX_LENGTH_SHORTLINK, MAX_LENGTH_SLUG, MAX_LENGTH_TAG,
-                        MAX_LENGTH_UNIT)
+from .constants import (
+    MAX_LENGTH_NAME_INGREDIENT, MAX_LENGTH_NAME_RECIPE, MAX_LENGTH_SHORTLINK,
+    MAX_LENGTH_SLUG, MAX_LENGTH_TAG, MAX_LENGTH_UNIT)
 
 User = get_user_model()
 
@@ -204,7 +204,7 @@ class ShortLink(models.Model):
 
     def generate_short_link(self):
         """Генерирует уникальную короткую ссылку."""
-        length = 3
+        length = MAX_LENGTH_SHORTLINK
         characters = ascii_letters + digits
         while True:
             short_link = ''.join(random.choices(characters, k=length))

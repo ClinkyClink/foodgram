@@ -6,15 +6,16 @@ from . import models
 
 class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
     def clean(self):
-        count = 0
-        for form in self.forms:
-            try:
-                if form.cleaned_data:
-                    count += 1
-            except AttributeError:
-                pass
-        if count < 1:
-            raise forms.ValidationError('Добавьте ингредиенты')
+        super().clean()
+        if self.instance.pk is None:
+            count = sum(1 for form in self.forms if form.cleaned_data)
+            if count < 1:
+                raise forms.ValidationError('Добавьте ингредиенты')
+        else:
+            current_ingredients = self.instance.recipeingredients.all().count()
+            if current_ingredients < 1:
+                raise forms.ValidationError('Добавьте ингредиенты')
+        return super().clean()
 
 
 class RecipeIngredientInline(admin.TabularInline):
