@@ -65,7 +65,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        formset = self.get_formset(request, obj, form=form)
+        formset = request.formsets[RecipeIngredientInline.get_formset_name()]
         formset.save()
         if obj.recipeingredients.count() == 0:
             obj.recipeingredients.add(formset.instance)
