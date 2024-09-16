@@ -60,10 +60,13 @@ class RecipeAdmin(admin.ModelAdmin):
         return obj.favorites.count()
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        if obj.recipeingredients.count() < 1:
-            obj.delete()
-            raise forms.ValidationError('Добавьте ингредиенты')
+        if form.is_valid():
+            if form.cleaned_data.get('recipeingredients').count() < 1:
+                raise forms.ValidationError('Добавьте ингредиенты')
+            else:
+                super().save_model(request, obj, form, change)
+        else:
+            pass
 
 
 @admin.register(models.RecipeIngredient)

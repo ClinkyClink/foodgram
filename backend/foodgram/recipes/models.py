@@ -116,7 +116,11 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Ингредиенты рецепта'
         constraints = [
             models.UniqueConstraint(fields=['recipe', 'ingredient'],
-                                    name='unique_recipe_ingredient')
+                                    name='unique_recipe_ingredient'),
+            models.CheckConstraint(
+                check=models.Q(recipeingredients__isnull=False),
+                name='recipe_must_have_ingredients'
+            )
         ]
 
     def __str__(self):
