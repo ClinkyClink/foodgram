@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 
 from . import models
 
@@ -49,6 +50,11 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='В избранном')
     def in_favorites(self, obj):
         return obj.favorites.count()
+
+    def save_model(self, request, obj, form, change):
+        if obj.recipeingredients.count() == 0:
+            raise ValidationError('Нельзя сохранять рецепт без ингредиентов.')
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.RecipeIngredient)

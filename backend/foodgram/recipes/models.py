@@ -136,6 +136,10 @@ class RecipeIngredient(models.Model):
             raise ValidationError("Количество должно быть больше 0")
         return super().clean()
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
 
 class Favorite(models.Model):
     """Модель избранных рецептов."""
