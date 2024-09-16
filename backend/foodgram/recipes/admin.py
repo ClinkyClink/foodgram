@@ -69,13 +69,14 @@ class RecipeAdmin(admin.ModelAdmin):
         formsets = self.get_inline_formsets(request,
                                             [obj],
                                             form,
-                                            self.get_fieldsets())
+                                            self.get_fieldsets(request))
         for formset in formsets:
             if formset.model == models.RecipeIngredient:
                 formset.save()
                 if obj.recipeingredients.all().count() == 0:
-                    messages.error(request, 'Необходимо добавить'
-                                   'хотя бы один ингредиент к рецепту.')
+                    messages.error(request,
+                                   'Необходимо добавить хотя бы один'
+                                   'ингредиент к рецепту.')
                     return HttpResponseRedirect(request.path)
                 break
 
