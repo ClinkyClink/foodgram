@@ -30,9 +30,8 @@ class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
         super().delete()
 
 
-class RecipeIngredientInline(admin.TabularInline):
+class RecipeIngredientInline(admin.StackedInline):
     model = models.RecipeIngredient
-    formset = IngredientsInlineFormset
     extra = 2
 
 
@@ -63,6 +62,17 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='В избранном')
     def in_favorites(self, obj):
         return obj.favorites.count()
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if change:
+            formset = RecipeIngredientInline.get_formset(request,
+                                                         obj,
+                                                         form=form)
+            formset.save()
+            if obj.recipeingredients.count() == 0:
+                obj.recipeingredients.add(formset.instance)
+                obj.save()
 
 
 @admin.register(models.RecipeIngredient)
