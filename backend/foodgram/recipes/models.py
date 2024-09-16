@@ -129,11 +129,18 @@ class RecipeIngredient(models.Model):
         )
 
     def clean(self):
-        if not self.ingredient:
-            raise ValidationError("Ингредиент должен быть выбран")
-        if self.amount < 1:
-            raise ValidationError("Количество должно быть больше 0")
-        return super().clean()
+        super().clean()
+        if not self.recipeingredients.exists():
+            raise ValidationError('Нельзя сохранить рецепт без ингредиентов.')
+        for recipe_ingredient in self.recipeingredients.all():
+            if not recipe_ingredient.ingredient:
+                raise ValidationError("Ингредиент должен быть выбран.")
+            if recipe_ingredient.amount < 1:
+                raise ValidationError("Количество должно быть больше 0.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class Favorite(models.Model):

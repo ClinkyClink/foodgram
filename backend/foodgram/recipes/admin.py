@@ -12,9 +12,11 @@ class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
             if not form.cleaned_data.get('DELETE', False):
                 count += 1
         if count < 1:
-            raise forms.ValidationError('Нельзя удалить все ингредиенты.'
-                                        'Добавьте хотя бы один ингредиент.',
-                                        code='no_ingredients')
+            raise forms.ValidationError(
+                'Нельзя удалить все ингредиенты.'
+                'Добавьте хотя бы один ингредиент.',
+                code='no_ingredients'
+            )
 
 
 class RecipeIngredientInline(admin.TabularInline):
