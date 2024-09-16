@@ -61,7 +61,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        if obj.recipeingredients.count() < 1:
+        if change and obj.recipeingredients.count() < 1:
             raise forms.ValidationError('Добавьте ингредиенты')
 
 
