@@ -17,15 +17,23 @@ class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
 
         return super().clean()
 
+    def delete(self):
+        if self.instance.pk:
+            count = 0
+            for form in self.forms:
+                if form.cleaned_data and form.cleaned_data.get('DELETE',
+                                                               False) is False:
+                    count += 1
+            if count < 1:
+                raise forms.ValidationError('Нельзя удалить все ингредиенты',
+                                            code='no_ingredients')
+        super().delete()
+
 
 class RecipeIngredientInline(admin.TabularInline):
     model = models.RecipeIngredient
     formset = IngredientsInlineFormset
     extra = 2
-
-    def clean(self):
-        cleaned_data = super().clean()
-        return cleaned_data
 
 
 @admin.register(models.Ingredient)
