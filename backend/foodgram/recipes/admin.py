@@ -1,5 +1,6 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.shortcuts import HttpResponseRedirect
 
 from . import models
 
@@ -65,12 +66,17 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        formsets = self.get_inline_formsets(request, [obj], form, change)
+        formsets = self.get_inline_formsets(request,
+                                            [obj],
+                                            form,
+                                            self.get_fieldsets())
         for formset in formsets:
             if formset.model == models.RecipeIngredient:
                 formset.save()
                 if obj.recipeingredients.all().count() == 0:
-                    pass
+                    messages.error(request, 'Необходимо добавить'
+                                   'хотя бы один ингредиент к рецепту.')
+                    return HttpResponseRedirect(request.path)
                 break
 
 
