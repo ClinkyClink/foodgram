@@ -25,12 +25,9 @@ class RecipeIngredientInline(admin.TabularInline):
     model = models.RecipeIngredient
     formset = IngredientsInlineFormset
     extra = 2
-    fields = ('name', 'quantity', 'unit')
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get('name'):
-            raise forms.ValidationError('Название ингредиента обязательно')
         return cleaned_data
 
 
