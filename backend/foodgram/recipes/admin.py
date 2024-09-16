@@ -9,14 +9,24 @@ class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
         super().clean()
         count = 0
         for form in self.forms:
-            if not form.cleaned_data.get('DELETE', False):
+            if form.cleaned_data:
                 count += 1
         if count < 1:
-            raise forms.ValidationError(
-                'Нельзя удалить все ингредиенты.'
-                'Добавьте хотя бы один ингредиент.',
-                code='no_ingredients'
-            )
+            raise forms.ValidationError('Добавьте ингредиенты',
+                                        code='no_ingredients')
+        return super().clean()
+
+    def delete(self):
+        if self.instance.pk:
+            count = 0
+            for form in self.forms:
+                if form.cleaned_data and form.cleaned_data.get('DELETE',
+                                                               False) is False:
+                    count += 1
+            if count < 1:
+                raise forms.ValidationError('Нельзя удалить все ингредиенты',
+                                            code='no_ingredients')
+        super().delete()
 
 
 class RecipeIngredientInline(admin.TabularInline):
