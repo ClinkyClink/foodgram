@@ -65,7 +65,9 @@ class RecipeAdmin(admin.ModelAdmin):
             if ingredients:
                 for ingredient in ingredients:
                     if ingredient.amount < 1:
-                        raise forms.ValidationError('Убедитесь, что у каждого ингредиента есть количество.')
+                        raise forms.ValidationError('Убедитесь, что вы '
+                                                    'добавили количество '
+                                                    'ингредиента.')
                 if ingredients.count() < 1:
                     raise forms.ValidationError('Добавьте ингредиенты')
             else:
