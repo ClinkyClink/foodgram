@@ -102,7 +102,6 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         related_name='recipeingredients',
         verbose_name='Рецепт'
-
     )
     ingredient = models.ForeignKey(
         Ingredient,
@@ -135,10 +134,6 @@ class RecipeIngredient(models.Model):
         if self.amount < 1:
             raise ValidationError("Количество должно быть больше 0")
         return super().clean()
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
 
 
 class Favorite(models.Model):
