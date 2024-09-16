@@ -7,22 +7,14 @@ from . import models
 class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
     def clean(self):
         super().clean()
-        if self.instance.pk is None:
-            count = 0
-            for form in self.forms:
-                if form.cleaned_data:
-                    count += 1
-            if count < 1:
-                raise forms.ValidationError('Добавьте ингредиенты',
-                                            code='no_ingredients')
-        else:
-            count = 0
-            for form in self.forms:
-                if form.cleaned_data:
-                    count += 1
-            if count < 1:
-                raise forms.ValidationError('Добавьте ингредиенты',
-                                            code='no_ingredients')
+        count = 0
+        for form in self.forms:
+            if form.cleaned_data:
+                count += 1
+        if count < 1:
+            raise forms.ValidationError('Добавьте ингредиенты',
+                                        code='no_ingredients')
+
         return super().clean()
 
 
