@@ -69,10 +69,8 @@ class RecipeAdmin(admin.ModelAdmin):
         for formset in formsets:
             if formset.model == models.RecipeIngredient:
                 formset.save()
-                if obj.recipeingredients.count() == 0:
-                    new_ingredient = formset.instance
-                    obj.recipeingredients.add(new_ingredient)
-                    obj.save()
+                if obj.recipeingredients.all().count() == 0:
+                    pass
                 break
 
 
