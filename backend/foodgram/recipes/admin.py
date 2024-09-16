@@ -13,11 +13,10 @@ class IngredientsInlineFormset(forms.models.BaseInlineFormSet):
                 if form.cleaned_data:
                     count += 1
             if count < 1:
-                raise forms.ValidationError('Добавьте ингредиенты')
+                raise forms.ValidationError('Добавьте ингредиенты',
+                                            code='no_ingredients')
         else:
-            current_ingredients = self.instance.recipeingredients.all().count()
-            if current_ingredients < 1:
-                raise forms.ValidationError('Добавьте ингредиенты')
+            pass
         return super().clean()
 
 
@@ -58,21 +57,6 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='В избранном')
     def in_favorites(self, obj):
         return obj.favorites.count()
-
-    def save_model(self, request, obj, form, change):
-        if form.is_valid():
-            ingredients = form.cleaned_data.get('recipeingredients')
-            if ingredients:
-                for ingredient in ingredients:
-                    if ingredient.amount < 1:
-                        raise forms.ValidationError('Убедитесь, что вы '
-                                                    'добавили количество '
-                                                    'ингредиента.')
-            else:
-                raise forms.ValidationError('Добавьте ингредиенты')
-            super().save_model(request, obj, form, change)
-        else:
-            pass
 
 
 @admin.register(models.RecipeIngredient)
