@@ -61,10 +61,16 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if form.is_valid():
-            if form.cleaned_data.get('recipeingredients').count() < 1:
-                raise forms.ValidationError('Добавьте ингредиенты')
+            ingredients = form.cleaned_data.get('recipeingredients')
+            if ingredients:
+                for ingredient in ingredients:
+                    if ingredient.amount < 1:
+                        raise forms.ValidationError('Убедитесь, что у каждого ингредиента есть количество.')
+                if ingredients.count() < 1:
+                    raise forms.ValidationError('Добавьте ингредиенты')
             else:
-                super().save_model(request, obj, form, change)
+                raise forms.ValidationError('Добавьте ингредиенты')
+            super().save_model(request, obj, form, change)
         else:
             pass
 
